@@ -1,0 +1,81 @@
+LuaLoveLetter
+
+Main Menu
+
+-Practice
+-Multiplayer
+-Campaign
+-Settings
+
+Practice Scene
+
+-no difficulty level
+-init scene with deck
+-ask if player wants tutorial
+-do visual tutorial
+-Begin Game
+
+
+
+Objects
+
+-Game
+	state = GameState
+	deck = Deck
+	players = Player[]
+
+	currentPlayerIndex = int
+
+	Init()
+	BeginRound()
+	BeginTurn()
+	EndTurn()
+	EndRound()
+
+-Deck
+	activeStack = Card[]
+	discardStack = Card[]
+	Shuffle()(void)
+	Draw()(Card)
+	DealTo(Player...)(void)
+
+-Player
+	status = PlayerStatus
+	myHand = Hand
+
+-Hand
+	cards = Card[]
+	Shuffle()(void)
+	RandomDiscard(Deck)(void)
+
+-Card
+	name = string
+	rank = int
+	img = png
+	effect = Effect
+
+	Use()(void)
+	Discard(Deck)(void)
+
+ENUM
+
+GameState = {
+	0: None,
+	1: BeginRound,
+	2: Turn,
+	3: EndRound,
+	4: Over
+}
+
+PlayerStatus = {
+	0: None,
+	1: InPlay,
+	2: Lose,
+	3: Win
+}
+
+Effect = {
+	0: None,
+	1: Guess,
+	2: Foo,
+}
