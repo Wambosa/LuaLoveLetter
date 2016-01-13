@@ -1,3 +1,4 @@
+local card = require('core.card')
 local composer = require('composer')
 local scene = composer.newScene()
 
@@ -13,10 +14,22 @@ local scene = composer.newScene()
 -- "scene:create()"
 function scene:create( event )
 
-   local sceneGroup = self.view
+    print('Loading Sandbox')
 
-   -- Initialize the scene here.
-   -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+    local sceneGroup = self.view
+
+    -- Initialize the scene here.
+    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+   
+    local list = {
+        card.newCard('Guard', 1, 'img/cards/001_guard', 1),
+        card.newCard('Guard', 1, 'img/cards/001_guard', 1),
+    }
+   
+    for _, item in ipairs(list) do 
+        print(item.name.." "..item.rank)
+    end
+   
 end
 
 -- "scene:show()"
