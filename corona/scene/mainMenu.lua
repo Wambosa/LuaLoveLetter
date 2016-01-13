@@ -1,5 +1,6 @@
-local composer = require('composer')
 local widget = require('widget')
+local composer = require('composer')
+
 local scene = composer.newScene()
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
@@ -23,16 +24,55 @@ function scene:create( event )
 	
 	local practiceButton = widget.newButton{
 		defaultFile = 'img/buttonYellow.png',
-		overFile = "img/buttonYellowOver.png",
-		label = "Practice",
+		overFile = 'img/buttonYellowOver.png',
+		label = 'Practice',
 		emboss = true,
 		onPress = function() end,
-		onRelease = function() end,
+		onRelease = function() composer.gotoScene('scene.sandbox') end
 	}
+	
+	local multiPlayerButton = widget.newButton{
+		defaultFile = 'img/buttonYellow.png',
+		overFile = 'img/buttonYellowOver.png',
+		label = 'Multiplayer',
+		emboss = true,
+		onPress = function() end,
+		onRelease = function() end
+	}
+	
+	local campaignButton = widget.newButton{
+		defaultFile = 'img/buttonYellow.png',
+		overFile = 'img/buttonYellowOver.png',
+		label = 'Campaign',
+		emboss = true,
+		onPress = function() end,
+		onRelease = function() end
+	}
+	
+	local settingsButton = widget.newButton{
+		defaultFile = 'img/buttonYellow.png',
+		overFile = 'img/buttonYellowOver.png',
+		label = 'Settings',
+		emboss = true,
+		onPress = function() end,
+		onRelease = function() end
+	}
+	
+	practiceButton.x = display.contentCenterX
+	multiPlayerButton.x = display.contentCenterX
+	campaignButton.x = display.contentCenterX
+	settingsButton.x = display.contentCenterX
+	
+	practiceButton.y = display.contentCenterY * .6
+	multiPlayerButton.y = display.contentCenterY * .9
+	campaignButton.y = display.contentCenterY * 1.2
+	settingsButton.y = display.contentCenterY * 1.5
 	
 	sceneGroup:insert(back)
 	sceneGroup:insert(practiceButton)
-	
+	sceneGroup:insert(multiPlayerButton)
+	sceneGroup:insert(campaignButton)
+	sceneGroup:insert(settingsButton)
 end
 
 -- "scene:show()"

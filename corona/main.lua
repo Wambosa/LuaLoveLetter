@@ -1,5 +1,5 @@
 -- entry point
---require("mobdebug").start()
+-- require("mobdebug").start()
 
 local composer = require('composer')
 
@@ -14,7 +14,7 @@ local function run()
     
     main:showSplashScreen()
     
-    timer.performWithDelay(3000, main)
+    timer.performWithDelay(1000, main)
 end
 
 function main:showSplashScreen()
