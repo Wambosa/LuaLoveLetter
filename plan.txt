@@ -39,13 +39,15 @@ Objects
 	Draw()(Card)
 	DealTo(Player...)(void)
 
+	5 guards, 2 priests, 2 barons, 2 handmaids, 2 princes, 1 king, 1 countess, 1 princess.
+
 -Player
 	status = PlayerStatus
 	myHand = Hand
 
 -Hand
 	cards = Card[]
-	Shuffle()(void)
+	Scramble()(void)
 	RandomDiscard(Deck)(void)
 
 -Card

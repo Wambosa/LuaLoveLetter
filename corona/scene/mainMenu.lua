@@ -58,6 +58,8 @@ function scene:create( event )
 		onRelease = function() end
 	}
 	
+	-- todo: add a button for running test cases.
+	
 	practiceButton.x = display.contentCenterX
 	multiPlayerButton.x = display.contentCenterX
 	campaignButton.x = display.contentCenterX

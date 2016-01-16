@@ -1,35 +1,9 @@
--- entry point
--- require("mobdebug").start()
-
+ require("mobdebug").start()
+ require('core.extensions')
 local composer = require('composer')
 
-CORE = {
-    
-    GameState = {
-        none = 0,
-        beginRound = 1,
-        turn = 2,
-        endRound = 3,
-        over = 4
-    },
-    
-    PlayerStatus = {
-        none = 0,
-        inPlay = 1,
-        lose = 2,
-        win = 3
-    },
-    
-    CardAbility = {
-        none = 0,
-        accuse = 1,     -- guess player strategy, if true, that player loses the round
-        spy = 2,        -- view target player hand
-        debate = 3,     -- force a comparison of hands. low card loses the round
-        protect = 4,    -- cannot be targeted until next turn
-        policy = 5,     -- a sudden change in policy causes the selected player to discard hand and draw a card
-        mandate = 6     -- trade hands with target player (you select the card)
-    }
-}
+local timestamp = os.time()
+math.randomseed(timestamp)
 
 local main = {
     splash = nil,
@@ -38,7 +12,7 @@ local main = {
 
 local function run()
     
-    print("Runnning LuaLoveLetter")
+    print_r('RUN: LuaLoveLetter at', timestamp)
     
     main:showSplashScreen()
     
@@ -75,9 +49,9 @@ function main.getRandomRGB()
 end
 
 --
---begin game!
+-- this is an implicit event handler
 function main:timer()
-    print("Begin Game")
+    print_r("LOG: Closing Splashscreen")
     display.currentStage:removeEventListener("tap", self.text.onScreenTap)
     self.splash:removeSelf()
     self.text:removeSelf()
