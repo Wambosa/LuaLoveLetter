@@ -41,7 +41,7 @@ local function onTouch( event )
 			
 			-- Gradually show the shape's stroke depending on how much pressure is applied.
 			if ( event.pressure ) then
-				card:setStrokeColor( 1, 1, 1, event.pressure )
+				card:setStrokeColor( 0, 255, 0, event.pressure )
 			end
 		elseif "ended" == phase or "cancelled" == phase then
 			display.getCurrentStage():setFocus( nil )
@@ -62,6 +62,8 @@ function scene:create( event )
 
     print_r('LOG: Loading Sandbox with game state', game.state)
 
+	-- in practice mode, the game will create itself. later on, ill need to server to send initial gamestate and updates to the client
+	
     local gameOptions = {
         playerCount = 2,
         playerNames = {'James', 'Bill'},
@@ -77,11 +79,13 @@ function scene:create( event )
         
         for __, card in ipairs(player.hand.cards) do
             --todo: set player color and touch restriction(only make touchable cards for yourself)
-            local cardView = display.newImage(card.img)
+            local cardView = display.newImage(card.img) -- or cardback if not mine
             
-            cardView.width, cardView.height = cardView.width*.5, cardView.height*.5
+            cardView.width, cardView.height = 71, 100
             
-            cardView:addEventListener('touch', onTouch)            
+			if(player.name == 'James') then
+				cardView:addEventListener('touch', onTouch)
+			end            
         end
     end
 end
