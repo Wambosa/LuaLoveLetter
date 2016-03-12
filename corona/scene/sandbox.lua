@@ -79,13 +79,18 @@ function scene:create( event )
         
         for __, card in ipairs(player.hand.cards) do
             --todo: set player color and touch restriction(only make touchable cards for yourself)
-            local cardView = display.newImage(card.img) -- or cardback if not mine
-            
-            cardView.width, cardView.height = 71, 100
-            
+
+			local cardView
+
 			if(player.name == 'James') then
+				
+				cardView = display.newImage(card.img)
 				cardView:addEventListener('touch', onTouch)
-			end            
+			else
+				cardView = display.newImage('img/cards/000_back.png')
+			end
+			
+			cardView.width, cardView.height = 71, 100
         end
     end
 end
