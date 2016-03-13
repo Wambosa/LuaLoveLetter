@@ -17,6 +17,22 @@ table.deepCopy = function(orig)
 	return copy
 end
 
+function math.sign(x)
+    if x<0 then
+        return -1
+    elseif x>0 then
+        return 1
+    else
+        return 0
+    end
+end
+
+function math.clamp( _in, low, high )
+    if (_in < low ) then return low end
+	if (_in > high ) then return high end
+	return _in
+end
+
 print_r = function(message, obj, tabDepth)
 	--todo: maybe get the func signature? metatable?
 	tabDepth = tabDepth or 0

@@ -9,13 +9,19 @@ local scene = composer.newScene()
 
 -- local forward references should go here
 
+local selCard
+
+local function unTiltCard()
+    if(selCard.isFocus) then
+        selCard.path.x1, selCard.path.x2, selCard.path.x3 ,selCard.path.x4 = selCard.path.x1*.9, selCard.path.x2*.9, selCard.path.x3*.9 ,selCard.path.x4*.9
+        selCard.path.y1, selCard.path.y2, selCard.path.y3 ,selCard.path.y4 = selCard.path.y1*.9, selCard.path.y2*.9, selCard.path.y3*.9 ,selCard.path.y4*.9
+    end
+end
+
 local function onTouch( event )
 	local card = event.target
 	
-	-- Print info about the event. For actual production code, you should
-	-- not call this function because it wastes CPU resources.
-	print('x:'..card.x, 'y:'..card.y)
-	
+    
 	local phase = event.phase
 	if "began" == phase then
 		-- Make target the top-most object
@@ -23,6 +29,10 @@ local function onTouch( event )
 		parent:insert( card )
 		display.getCurrentStage():setFocus( card )
 		
+        selCard = card
+        Runtime:addEventListener("enterFrame", unTiltCard)
+        -- add event listener for every frame
+        
 		-- Spurious events can be sent to the target, e.g. the user presses 
 		-- elsewhere on the screen and then moves the finger over the target.
 		-- To prevent this, we add this flag. Only when it's true will "move"
@@ -36,17 +46,53 @@ local function onTouch( event )
 		if "moved" == phase then
 			-- Make object move (we subtract t.x0,t.y0 so that moves are
 			-- relative to initial grab point, rather than object "snapping").
-			card.x = event.x - card.x0
-			card.y = event.y - card.y0
-			
-			-- Gradually show the shape's stroke depending on how much pressure is applied.
-			if ( event.pressure ) then
-				card:setStrokeColor( 0, 255, 0, event.pressure )
-			end
+            local oldX = card.x
+            local oldY = card.y
+            local newX = event.x - card.x0
+            local newY = event.y - card.y0
+            
+            --if there is any drag movement from the touch then tilt the card
+            if((newX+newY) ~= math.ceil(oldX+oldY)) then
+                
+                print("old:"..oldY, "new"..newY)
+                
+                local lessX = (card.contentWidth * .0025) + math.abs((card.path.x1+card.path.x2+card.path.x3+card.path.x4)*.5)
+                local lessY = (card.contentHeight * .0025) + math.abs((card.path.y1+card.path.y2+card.path.y3+card.path.y4)*.5)
+                
+                local dragLeft = 0
+                local dragRight = 0
+                if(math.abs(oldX-newX) > 1.5) then
+                    dragLeft = math.clamp(math.sign(oldX-newX) * lessX, 0, card.contentWidth*.5)
+                    dragRight = math.clamp(math.sign(oldX-newX) * lessX, -card.contentWidth*.5, 0)
+                end
+
+                local dragUp = math.clamp(math.sign(oldY-newY) * lessY, 0, card.contentHeight*.1)
+                local dragDown = math.clamp(math.sign(oldY-newY) * lessY, -card.contentHeight*.1, 0)          
+                
+                local xMod = .3
+                local yMod = .2
+                
+                card.path.x1 = dragLeft + (dragUp*yMod)
+                card.path.x2 = dragLeft + (dragDown*-yMod)
+                card.path.y1 = (dragLeft*xMod) + dragUp
+                card.path.y2 = dragLeft*-xMod + dragDown
+                
+                card.path.x4 = dragRight + (dragUp*-yMod)
+                card.path.x3 = dragRight + (dragDown*yMod)
+                card.path.y4 = dragRight*-xMod + dragUp
+                card.path.y3 = dragRight*xMod + dragDown
+            end
+            
+            transition.to( card, { time=35, x=newX, y=newY } )
+            
 		elseif "ended" == phase or "cancelled" == phase then
 			display.getCurrentStage():setFocus( nil )
-			card:setStrokeColor( 1, 1, 1, 0 )
 			card.isFocus = false
+            
+            card.path.x1, card.path.x2, card.path.x3 ,card.path.x4 = 0,0,0,0
+            card.path.y1, card.path.y2, card.path.y3 ,card.path.y4 = 0,0,0,0
+            Runtime:removeEventListener("enterFrame", unTiltCard)
+            -- remove animation event
 		end
 	end
 
@@ -85,9 +131,12 @@ function scene:create( event )
 			if(player.name == 'James') then
 				
 				cardView = display.newImage(card.img)
+                cardView.x = display.contentCenterX
+                cardView.y = display.contentCenterY
 				cardView:addEventListener('touch', onTouch)
 			else
 				cardView = display.newImage('img/cards/000_back.png')
+                cardView.x = display.contentCenterX
 			end
 			
 			cardView.width, cardView.height = 71, 100
