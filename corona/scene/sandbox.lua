@@ -34,6 +34,7 @@ local function onCardHover( event )
 		obj.isFocus = false
 		--transition back down to origin position
 		card.fill.effect = nil
+		card.strokeWidth = 0
 		transition.cancel(obj)
 		transition.to(obj, {time=100, y=0, width=71, height=100})
 	end
@@ -50,11 +51,19 @@ local function onCardHover( event )
 			card.y = -100
 			card.width, card.height = 142, 200
 			
-			card.strokeWidth = 5
-			card:setStrokeColor(0,1,0,1)
 			--card.stroke.effect = "generator.marchingAnts"
-			
+			local reStroke, unStroke
+			reStroke = function() transition.to(card, {time=50, strokeWidth=5, onComplete=unStroke}) end
+			unStroke = function() transition.to(card, {time=50, strokeWidth=.1, onComplete=reStroke}) end
+
+			reStroke()
+			 --can play with the glow speed according to the power of the card
 			transition.to(card, {time=3000, y=-120, width=142, height=200})
+			
+			card.strokeWidth=.1
+			card:setStrokeColor(57,255,20, 1)
+			-- try a stroke effect tranparent fade
+			
 			--card.fill.effect = "filter.swirl"
 			--transition.to(card.fill.effect, {time=2500, intensity=10})
 			--highlight somehow
