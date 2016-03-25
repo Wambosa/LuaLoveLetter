@@ -1,4 +1,7 @@
 --adds some functionality that i want to exist in lua core language
+function bind(obj, funcName)
+    return function(...) return obj[funcName](obj, ...) end
+end
 
 table.deepCopy = function(orig)
 	local orig_type = type(orig)

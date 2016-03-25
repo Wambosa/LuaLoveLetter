@@ -1,7 +1,7 @@
 local deck = require('core.deck')
 local player = require('core.player')
 
--- consider placing a hidden game master object with awareness of self here out of the return scope so that i can have limited access to it
+--note: this is specific to LoveLetter
 local game = {
 	
 	gameState = {
@@ -40,7 +40,6 @@ function game:init(gameOptions)
 		
 		-- banish n number of cards where n = 4 if playerCount = 2
 		for i=1, (gameOptions.playerCount == 2 and 4 or 1) do
-			--todo: consider a banish method on the deck that does this line with awareness of self
 			self.deck:banishTopCard()
 		end
 

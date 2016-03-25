@@ -1,6 +1,7 @@
 local hand = require('core.hand')
 
 local playerTemplate = {
+	index = 0,
 	name = 'scoundrel',
 	wins = 0,
 	status = 0,

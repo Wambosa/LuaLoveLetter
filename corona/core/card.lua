@@ -1,13 +1,11 @@
 local cardTemplate = {
 	name = 'card name',
 	rank = 0,
-	img = 'img/cards/008_princess',
+	img = 'img/cards/000_back',
 	use = function(foo) end,
-	discard = function(something) end,
+	discard = function(something) end,-- the discard action belongs to the hand/deck. a card cannot discard itself
 	abilitys = {}
 }
-
---todo: touch functions ?
 
 
 return {

@@ -1,5 +1,6 @@
- require("mobdebug").start()
- require('core.extensions')
+require("mobdebug").start()
+require('core.globals')
+require('core.extensions')
 local composer = require('composer')
 
 local timestamp = os.time()
@@ -48,7 +49,6 @@ function main.getRandomRGB()
   return math.random(0,100*.01), math.random(0,100*.01), math.random(0,100*.01)
 end
 
---
 -- this is an implicit event handler
 function main:timer()
     print_r("LOG: Closing Splashscreen")

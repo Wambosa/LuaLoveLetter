@@ -1,6 +1,8 @@
 local game = require('core.game')
 local composer = require('composer')
 local scene = composer.newScene()
+local deckVisModule = require('vis.deckVis')
+local playerVisModule = require('vis.playerVis')
 
 ---------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE
@@ -185,71 +187,21 @@ function scene:create( event )
 
     print_r('LOG: Loading Sandbox with game state', game.state)
 
-	-- in practice mode, the game will create itself. later on, ill need to server to send initial gamestate and updates to the client
-	
     local gameOptions = {
         playerCount = 2,
         playerNames = {'James', 'Bill'},
         startingHandAmount = 5, --todo: this is really one. change back to 1 later
         turnDrawAmount = 1
-    }
+	}
 
-    game:init(gameOptions)
+	game:init(gameOptions)
 
-    print_r('LOG: game has beeen initialized successfully')
-
-	local cardPixelWidth, cardPixelHeight = 71, 100 --todo: need to make this a percentage (create measured unit or read docs later)
-
-	local deckX, deckY = display.contentCenterX+100, display.contentCenterY
+	game.deckVis = deckVisModule.create(game.deck)
+	game.playerVis = playerVisModule.create(game.players[1]) --this is gonna be cool, since i can animate the name and hand on render. I just need to trigger
 	
-	local deckImages = display.newGroup()
-	
-	--cascade deck at 45 deg. place 1-2 pixels apart going downward. put them in the deckImages
-	for i=0, #game.deck.playPile, 1 do
-		local cardView
-		cardView = display.newImage(deckImages, 'img/cards/000_back.png')
-		cardView.width, cardView.height = cardPixelWidth*.5, cardPixelHeight*.5
-		cardView.rotation = -45 + math.random(-20, 20) --can make the deck look messy shuffled with a variance to the rotation
-		cardView.x, cardView.y = deckX, deckY-i
-	end
-
 	--todo: create an array of player cardGroups. same as player number to access the group
-	local handImages = display.newGroup()
-	local foeImages = display.newGroup()
-	
-	handImages.x, handImages.y = display.contentCenterX, display.actualContentHeight
-	foeImages.x = display.contentCenterX
 
-    for _, player in ipairs(game.players) do
-        
-		local cardsInHand = #player.hand.cards
-		
-        for position, card in ipairs(player.hand.cards) do
-            --todo: set player color and touch restriction(only make touchable cards for yourself)
-
-			local cardView
-			--todo: need a card/deckView object that is responsible for knowing where it belongs as well as size and various animations/effects (8 is screen limit right now)
-			if(player.name == 'James') then
-				print("starting hand: "..card.name)
-				cardView = display.newImageRect(handImages, card.img, cardPixelWidth, cardPixelHeight)
-				cardView.data = card
-				cardView.x = ((cardsInHand*cardPixelWidth)*-.5) + (cardPixelWidth*position) - (cardPixelWidth*.5)--this last bit is to offset to the center of the card
-				cardView.rotation = (-4.5*(cardsInHand*.5)) + (position*4.5)
-				cardView:addEventListener('touch', onCardHover)
-			else
-				print("foe hand: "..card.name)
-				cardView = display.newImage(foeImages, 'img/cards/000_back.png')
-                cardView.x = ((cardsInHand*cardPixelWidth)*-.5) + (cardPixelWidth*position) - (cardPixelWidth*.5)
-				cardView.rotation = 180 + (4.5*(cardsInHand*.5)) - (position*4.5)
-			end
-			
-			cardView.width, cardView.height = cardPixelWidth, cardPixelHeight
-        end
-    end
 end
-
-
-
 
 -- "scene:show()"
 function scene:show( event )
@@ -261,6 +213,14 @@ function scene:show( event )
       -- Called when the scene is still off screen (but is about to come on screen).
       
    elseif ( phase == "did" ) then
+		
+		local showPlayerVis = function()
+			game.playerVis:render(bind(game.deckVis, 'draw'))
+		end
+		
+		game.deckVis:render(display.contentCenterX+100, display.contentCenterY, showPlayerVis)
+		
+
       -- Called when the scene is now on screen.
       -- Insert code here to make the scene come alive.
       -- Example: start timers, begin animation, play audio, etc.
