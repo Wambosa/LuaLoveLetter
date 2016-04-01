@@ -3,8 +3,9 @@ local handTemplate = {
 	cards = {}
 }
 
-function handTemplate:addCard(aCard)
-	table.insert(self.cards, aCard)
+function handTemplate:addCard(card)
+	card.index = #self.cards+1
+	table.insert(self.cards, card)
 end
 
 function handTemplate:scramble()
@@ -16,14 +17,15 @@ function handTemplate:discard(index, cardStack)
 end
 
 function handTemplate:randomDiscard()
-	--todo: prolly not this card game
+	--todo: prolly not this card game (but for AI target?)
 end
 
 return {
 	newHand = function(...)
 		local aHand = table.deepCopy(handTemplate)
 		
-		if not arg then-- wha?? this seems wrong
+		--note: since a empty arg passed is also a table, we have to check the length of that table
+		if #arg > 0 then
 			for _, aCard in ipairs(arg) do
 				aHand:addCard(aCard)
 			end

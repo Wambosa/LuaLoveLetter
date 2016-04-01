@@ -3,24 +3,21 @@ local hand = require('core.hand')
 local playerTemplate = {
 	index = 0,
 	name = 'scoundrel',
+	state = 'none', -- none wait turn lose win
 	wins = 0,
-	status = 0,
+	deck = { --todo: actually use the deck module in a more complex game
+		playPile = {}
+	},
 	hand = hand.newHand()
 }
 
 
 return {
-	
-	playerStatus = {
-        none = 0,
-        inPlay = 1,
-        lose = 2,
-        win = 3
-    },
-	
-	newPlayer = function(name)
-		local aPlayer = table.deepCopy(playerTemplate)
-		aPlayer.name = name
-		return aPlayer
+	newPlayer = function(index, name)
+		local player = table.deepCopy(playerTemplate)
+		player.index = index
+		player.name = name
+		player.state = 'wait'
+		return player
 	end
 }

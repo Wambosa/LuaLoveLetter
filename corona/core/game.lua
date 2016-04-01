@@ -3,71 +3,96 @@ local player = require('core.player')
 
 --note: this is specific to LoveLetter
 local game = {
-	
-	gameState = {
-		none = 0,
-		beginRound = 1,
-		turn = 2,
-		endRound = 3,
-		over = 4
-    },
-	
-	state = 0,
-	
+	state = 'none', --none beginRound turn endRound over
 	players = {},
-	
-	currentPlayerTurn = 0,
-	
-	deck = deck.newDeck()
+	currentPlayerIndex = 0,
+	deck = nil,
+	startingHandAmount = 0
 }
 
 local gameOptionsTemplate = {
-	playerCount = 2,
+	playerCount = 2,--todo: redundant
 	playerNames = {'player 1', 'player 2'},
 	startingHandAmount = 1,
 	turnDrawAmount = 1,
 }
---note: this might only work if the game is local or this is the server. i'll need to sync changes later
+--note: the game is local. this is not client-server designed
 function game:init(gameOptions)
 		
-		print_r('BUG: gameOptions.playerCount', gameOptions.playerCount)
 		print_r('gameOptions', gameOptions)
 		
-		assert(gameOptions.playerCount, 'gameOptions requires playerCount to be set')
+		assert(#gameOptions.playerNames > 1, 'gameOptions requires at least 2 players to be set')
 		assert(gameOptions.startingHandAmount, 'gameOptions requires startingHandAmount to be set')
 		
-		self.deck:shuffle()
+		self.startingHandAmount = gameOptions.startingHandAmount
 		
-		-- banish n number of cards where n = 4 if playerCount = 2
-		for i=1, (gameOptions.playerCount == 2 and 4 or 1) do
-			self.deck:banishTopCard()
+		--create players
+		for i=1, #gameOptions.playerNames do
+			table.insert(self.players, player.newPlayer(i, gameOptions.playerNames[i]))
 		end
-
-		--create players and give them n cards
-		for i=1, gameOptions.playerCount do
-			table.insert(self.players, player.newPlayer(gameOptions.playerNames[i]))
-		
-			for j=1, gameOptions.startingHandAmount do
-				self.players[i].hand:addCard(self.deck:draw())
-			end
-		end
-		
-		-- determine who goes first
-		self.currentPlayerTurn = math.random(gameOptions.playerCount)
 		
 		print_r('game.players', self.players)
-		print('first player '.. self.currentPlayerTurn)
-		
-		--ready to begin round
-		self.state = 1
+		--todo: blocking this will always cause the playerIndex to be 1
+		--self.currentPlayerIndex = math.random(#gameOptions.playerNames)
 	end
 
-function game:beginRound() end
+function game:nextPlayer()
+	if(self.currentPlayerIndex ~= 0) then
+		self.players[self.currentPlayerIndex].state = 'wait'
+	end
+	self.currentPlayerIndex = self.currentPlayerIndex < #self.players and self.currentPlayerIndex+1 or 1
+	self.players[self.currentPlayerIndex].state = 'turn'
+end
+
+function game:beginRound()
 	
-function game:beginTurn() end
+	self.state = 'beginRound'
 	
-function game:endTurn() end
+	--note: need a deck:renew() or deck.newDeck(cardsArray) for multiple decks
+	self.deck = deck.newDeck()
+	self.deck:shuffle()
 	
-function game:endRound() end
+	--banish n number of cards where n = 4 if playerCount = 2
+	for i=1, (#self.players == 2 and 4 or 1) do
+		self.deck:banishTopCard()
+	end
+	
+	--deal n cards to players
+	for i=1, #self.players do
+		for j=1, self.startingHandAmount do
+			self.players[i].hand:addCard(self.deck:draw())
+		end
+	end
+	
+	self:nextPlayer()
+end
+
+function game:beginTurn()
+	
+	self.state = 'turn'
+	print('it is '..self.players[self.currentPlayerIndex].name.."'s turn")
+	self.players[self.currentPlayerIndex].hand:addCard(self.deck:draw())
+end
+
+function game:endTurn()
+	
+	if(#self.deck.playPile == 0) then
+		self:endRound()
+	else
+		self:nextPlayer()
+	end
+end
+	
+function game:endRound()
+	
+	--hmmmm...
+	--add wins to victor
+	self.state = 'endRound'
+	
+end
+
+function game:endGame()
+	--call when someone has 3 wins
+end
 
 return game

@@ -6,14 +6,18 @@ local makeReadonlyTable = function(aTable)
 	})
 end
 
-local cardPixelWidth, cardPixelHeight = 71, 100
+local cardPixelWidth, cardPixelHeight = 71, 100 --note: these measurements are as seen in hand. (unfocused)
 
 core = makeReadonlyTable({
+	cardBackImg = 'img/cards/000_back.png',
+	
+	--size: some common sizes i keep on referencing
 	cardPixelWidth = cardPixelWidth,
 	cardPixelHeight = cardPixelHeight,
-	--todo: most likely move this to one of the vis module as private funcs
-	-- also need to add a switch that determines if it is upsidedown or not.
-	calcHandXY = function(playerIndex) return playerIndex == 1 and display.contentCenterX, display.actualContentHeight or display.contentCenterX, 0 end,
-	calcCardPoint = function(cardCount, pos) return ((cardCount*cardPixelWidth)*-.5) + (cardPixelWidth*pos) - (cardPixelWidth*.5)end,
-	calcCardRotation = function(cardCount, pos) return (-4.5*(cardCount*.5)) + (pos*4.5) end
+	cardFocusZoom = 2.5,
+	cardDragZoom = .75,
+	
+	--time: delay in milliseconds
+	flipDelay = 150,
+	slideDelay = 350
 })

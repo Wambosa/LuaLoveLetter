@@ -1,7 +1,7 @@
 local card = require('core.card')
 
 local deckTemplate = {
-	cardLimit = 16, --todo: the init process manipulates the playPile and its count BEFORE any graphics occur. I need to figure something out
+	cardLimit = 16, --todo: the game:init process manipulates the playPile and its count BEFORE any graphics occur. I need to figure something out
 	playPile = {
 		card.newCard('Guard', 1, 'img/cards/001_guard.png', 1),
 		card.newCard('Guard', 1, 'img/cards/001_guard.png', 1),
@@ -43,7 +43,8 @@ function deckTemplate:shuffle()
 end
 	
 function deckTemplate:draw()
-	--todo: remember that we need to handle the case where the deck is empty
+	--todo: remember that we need to handle the case where the deck is empty. the deck should NOT be responsible?
+	-- actually, since we call the draw emthod inside of deckTemplate methods, it may be better to handle it by a reshuffle of the discard pile. (not all card games do this though...)
 	return table.remove(self.playPile, 1)
 end
 	
@@ -65,25 +66,8 @@ function deckTemplate:banishTopCard()
 		table.insert(self.banishPile, self:draw())
 end
 
-function deckTemplate:render(deckX, deckY)
-
-	self.deckImages = display.newGroup()
-	
-	for i=0, #self.playPile, 1 do
-		local cardView
-		cardView = display.newImage(self.deckImages, 'img/cards/000_back.png')
-		cardView.width, cardView.height = core.cardPixelWidth*3, core.cardPixelHeight*3
-		cardView.rotation = math.random(-30, 30)
-		cardView.x, cardView.y = deckX, deckY-i
-		transition.to(cardView, {time=550+(i*75), width=core.cardPixelWidth*.5, height=core.cardPixelHeight*.5, rotation=-45 + math.random(-20, 20)})
+return {
+	newDeck = function()
+		return table.deepCopy(deckTemplate)
 	end
-end
---todo: unrender?
-
-local deckModule = {}
-
-function deckModule:newDeck()
-	return table.deepCopy(deckTemplate)
-end
-
-return deckModule
+}
