@@ -11,9 +11,10 @@ local cardVisTemplate = {
 				if(not img.isFocus) then
 					img.isFocus = true
 					--note: make target the top-most object (remember that this may get more complex as more objects are added to the scene)
-					
-					--todo: scene.images:insert(self.parent.images)
-					self.parent.images:insert( self.images )
+
+					self.parent.images:toFront()
+					self.images:toFront()
+					--self.parent.images:insert( self.images )
 					display.getCurrentStage():setFocus( img )
 					
 					self:anim_slowHandRise()
@@ -54,7 +55,7 @@ local cardVisTemplate = {
 				
 				if(not img.isMoving) then
 					img.isMoving = true
-					--todo: this works right now because the card is a single object. will have to see if the group can have its path altered
+					--todo: this works right now because the card is a single object. will have to tilt each object on the card as well
 					self.enterFrame = function() self:unTiltCard() end
 					
 					Runtime:addEventListener("enterFrame", self.enterFrame)
@@ -86,12 +87,31 @@ local cardVisTemplate = {
 
 			elseif "ended" == phase or "cancelled" == phase then
 
-				print('todo: activate effect if in play zone and isPlayable', img:localToContent(0,0))
+				local x, y = img:localToContent(0,0)
 
-				display.getCurrentStage():setFocus( nil )
+				print('todo: activate effect if in play zone and isPlayable', x, y)
+
+				local box = 75
+				--todo: write a bounds check for possible "zones"/"slots" where a card can be played
+				if(x > display.contentCenterX-box and x < display.contentCenterX+box and y > display.contentCenterY-box and y < display.contentCenterY+box) then
+					
+					--consider moving this to the global event handler
+					self.model:use(self.parent.model, function(isSuccess)
+
+						if(isSuccess) then
+							self.state = 'inPlay'
+							self.parent:useCard(self)
+						else
+							self.state = 'inHand'
+						end
+					end)
+
+				else -- if player dropped the card in a strange place then just return to hand
+				
+					self.state = 'inHand'
+				end
+				
 				Runtime:removeEventListener("enterFrame", self.enterFrame)
-
-				self.state = 'inHand'
 				self:blur(img)
 			end
 		end
@@ -113,6 +133,8 @@ function cardVisTemplate:render(xyr, onAnimationEnd)
 		cardView:addEventListener('touch', bind(self, 'onCardTouch'))
 	end
 	
+	--idea: if not owned, put simple event listener that causes sound effect "keep your hands to yourself!"
+	
 	cardView.width, cardView.height = 0, core.cardPixelHeight
 	
 	self.images.x = xyr.x
@@ -133,13 +155,16 @@ function cardVisTemplate:onCardTouch( event )
 	
 	local phase = event.phase
 	
-	self.touchHandler[self.state](self, {x=event.x, y=event.y}, img, phase)
-	
+	if(self.touchHandler[self.state]) then
+		self.touchHandler[self.state](self, {x=event.x, y=event.y}, img, phase)
+	end
+
 	return true --this prevents event bubble up
 end
 
---animation: move - lifts the card into focus and magnifies x2
+--animation: move - lifts the card into focus and magnifies by Zoom
 function cardVisTemplate:anim_slowHandRise()
+	transition.cancel(self.images)
 	self.images.y = -core.cardPixelHeight*.5*core.cardFocusZoom
 	self.images.xScale, self.images.yScale = core.cardFocusZoom, core.cardFocusZoom
 	transition.to(self.images, {time=5000, y=(-core.cardPixelHeight*core.cardFocusZoom)*.55})
@@ -221,15 +246,25 @@ function cardVisTemplate:blur(img)
 	--todo: other stuff like style reset
 	transition.cancel(self.images)
 	
-	local x, y = self.parent:calcCardXY(self.index)
+	if(self.state == 'inHand') then
+		self.parent.images:insert(self.model.index, self.images)
+		self.parent:alignHand()
+	end
 	
-	transition.to(self.images, {
-		time = 100,
-		x = x,
-		y = y,
-		xScale = 1,
-		yScale = 1
-	})
+	if(self.state == 'inPlay') then
+		
+		local x, y, r = 0, 0, math.random(-30, 30)
+		
+		transition.to(self.images, {
+			time = 100,
+			x = x,
+			y = y,
+			rotation = r,
+			xScale = 1,
+			yScale = 1
+		})
+	end
+	
 end
 
 --module: cardVis

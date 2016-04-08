@@ -11,6 +11,10 @@ local playerTemplate = {
 	hand = hand.newHand()
 }
 
+function playerTemplate:discard(cardIndex)
+	print('discarding', self.hand.cards[cardIndex].name)
+	self.hand:discard(cardIndex, self.deck.playPile)
+end
 
 return {
 	newPlayer = function(index, name)

@@ -11,7 +11,71 @@ local playerVisModule = require('vis.playerVis')
 
 -- local forward references should go here
 
+local abilityFunc = {
 
+	accuse = function(event)
+		--target another player, then make selection as to what you think they have
+		
+		--render all 8 cards in a showcase-like fashion where the color is off a bit
+		
+		--on touch, increase size and fade in color or glow. second touch to confirm (show confirm text box center or double click card)
+		
+		--if your guess was right, then the card is revealed. if not, then a trap image is revealed
+		
+		--if the guess was right, then target opponent loses round and discards hand
+		
+		--game:checkRound() in order to determine if the round is over.
+		
+		--game:endTurn()
+	end,
+	spy = function(event)
+		--target another player
+		--render temp image and center on screen
+		--after a time, shrink erase the card and end turn
+	end,
+	debate = function(event)
+		--target player
+		--compare hands by revealing the target hand
+		--if your rank is greater then you survive the move and your opponent loses the round, else you lose the round
+		--whe a player is kicked out of the round, the player scratches the table in a random spot and/or spills coffee. so that there area has a clear indication of defeat
+		--end turn
+	end,
+	protect = function(event)
+		--set flag on player. cannot be targetted
+		--end turn
+	end,
+	policy = function(event)
+		--target player
+		--target player discards hand (check for princess and defeat target if discarded)
+		--end turn
+	end,
+	mandate = function(event)
+		--touch a card on the screen that does not belong to you. (this will require an event listener on the hidden card)
+		--i planed on having a listener anyways for the "keep your hands to yourself" don't even think about it" no peeking!" comments
+		--just data swap hands? and update images? some kind of draw method from another's hand?
+		--end turn
+	end,
+	subvert = function(event)
+		--actually occurs on draw. if you specifically draw king or prince, then disallow another card to be played
+		--maybe simply put a check on mandata and policy. if countess is in hand, then return false.
+	end,
+	favor = function(event) 
+		-- you forfiet the round
+	end
+}
+
+--
+Runtime:addEventListener("useCard", function(event)
+		
+	print("yeah this is getting crazy. called from card ", event.card.name)
+	--i choose to put the listener here since the Runtime is already global and i need a global event
+	--additionally, i will need to harmonize the visuals with the data and this scope has knowledge of both
+	
+	--currently the callback has the vis knowledge and handles movement
+	event.visCallback(true)
+end)
+
+--
 function scene:showTableTop()
 	local back = display.newRect(self.tableVis, display.contentCenterX, display.contentCenterY, display.contentWidth*1.5, display.contentHeight )
 
@@ -80,8 +144,8 @@ function scene:show( event )
 		local visualizeTheRestOfTheStuff = function()
 			print('should only be called once!')
 			
-			local showcaseBanished = display.newImageRect(self.buttons, 'img/invisible.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
-			showcaseBanished.x, showcaseBanished.y = display.contentCenterX+100, display.contentCenterY-(core.cardPixelHeight*.5)
+			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/invisible.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
+			self.deckVis.trigBanishShowcase.x, self.deckVis.trigBanishShowcase.y = display.contentCenterX+100, display.contentCenterY-(core.cardPixelHeight*.5)
 			
 			game:beginTurn()
 			
@@ -90,16 +154,7 @@ function scene:show( event )
 			--todo: loop draw n cards where n = gameOptions.turnDrawAmount
 			self.playerVisuals[p]:draw(#game.players[p].hand.cards, bind(self.deckVis, 'draw'))
 			
-			showcaseBanished:addEventListener('touch', function(event)
-				local button = event.target
-				local phase = event.phase
-				print('todo: create view for graveyard')
-				-- if game.state == 'turn' or game.state ~= 'none'
-				-- for i=1, #game.deck.banishPile, 1 do
-				-- detect position like hand, except move it to screen center.
-				-- have horizontal scroll functionality with chain border
-				-- (fade the background with transparent cover) touching the cover will cancel the banish view
-			end)
+			self.deckVis.trigBanishShowcase:addEventListener('touch', bind(self.deckVis, 'toggleBanishShowcase'))
 		end
 		
 		local visDealCards = function()

@@ -34,8 +34,9 @@ function game:init(gameOptions)
 		print_r('game.players', self.players)
 		--todo: blocking this will always cause the playerIndex to be 1
 		--self.currentPlayerIndex = math.random(#gameOptions.playerNames)
-	end
+end
 
+--
 function game:nextPlayer()
 	if(self.currentPlayerIndex ~= 0) then
 		self.players[self.currentPlayerIndex].state = 'wait'
@@ -43,7 +44,7 @@ function game:nextPlayer()
 	self.currentPlayerIndex = self.currentPlayerIndex < #self.players and self.currentPlayerIndex+1 or 1
 	self.players[self.currentPlayerIndex].state = 'turn'
 end
-
+--
 function game:beginRound()
 	
 	self.state = 'beginRound'
@@ -66,14 +67,14 @@ function game:beginRound()
 	
 	self:nextPlayer()
 end
-
+--
 function game:beginTurn()
 	
 	self.state = 'turn'
 	print('it is '..self.players[self.currentPlayerIndex].name.."'s turn")
 	self.players[self.currentPlayerIndex].hand:addCard(self.deck:draw())
 end
-
+--
 function game:endTurn()
 	
 	if(#self.deck.playPile == 0) then
@@ -82,7 +83,7 @@ function game:endTurn()
 		self:nextPlayer()
 	end
 end
-	
+--
 function game:endRound()
 	
 	--hmmmm...
@@ -90,9 +91,9 @@ function game:endRound()
 	self.state = 'endRound'
 	
 end
-
+--
 function game:endGame()
-	--call when someone has 3 wins
+	--call when someone has 3 rounds
 end
 
 return game

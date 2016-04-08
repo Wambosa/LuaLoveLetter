@@ -1,9 +1,9 @@
 local cardVisModule = require('vis.cardVis')
 
 local playerVisTemplate = {
-	index = 0,
 	model = nil,
-	images = nil, --note: container for all images and display groups. used to keep positioning relative to hand position center
+	images = nil, --note: container for hand images and display groups. used to keep positioning relative to hand position center
+	playImages = nil,
 	cardVisuals = {} --todo: needs to be an array of cardVis
 }
 
@@ -15,6 +15,8 @@ function playerVisTemplate:render(drawFunc, onAnimationEnd)
 	--todo: display avatar, player name, status (needs to be based on perspective. not the same render for local player and enemy player)
 		
 	self.images.x, self.images.y = self:calcHandXY()
+	self.playImages.x, self.playImages.y = self.images.x, self.images.y-75
+	self.playImages.xScale, self.playImages.yScale = .5, .5
 
 	local orderedFuncs = {}
 	
@@ -40,7 +42,7 @@ function playerVisTemplate:draw(cardIndex, drawFunc, onAnimationEnd)
 	
 	local moveToX, moveToY = self:calcCardXY(#self.model.hand.cards)
 	
-	moveToX, moveToY = moveToX+self.images.x , moveToY+self.images.y
+	moveToX, moveToY = moveToX+self.images.x, moveToY+self.images.y
 	
 	drawFunc(moveToX, moveToY, self:flipCard(card,
 			function() 
@@ -48,13 +50,35 @@ function playerVisTemplate:draw(cardIndex, drawFunc, onAnimationEnd)
 				if(onAnimationEnd)then onAnimationEnd() end
 	end))
 end
-
+--
+function playerVisTemplate:useCard(cardVis)
+	
+	--swap image groups and anchor points
+	self.playImages:insert(cardVis.images)
+	
+	--todo: sound effect (each card has its own effect)
+	
+	--data change of card leaving hand
+	self.model:discard(cardVis.model.index)
+	
+	--vis change of card leaving hand
+	self:alignHand()
+	
+	--perhaps the initial movement would be to enlarge the image and then shrink it back down on callback
+	transition.to(cardVis.images, {time=100, x=0, y=0, rotation=math.random(-30, 30), onComplete=function()
+		--todo: something after movement?
+		--like revert move if failed input or selection
+		
+	end})
+end
+--
 function playerVisTemplate:alignHand()
 	for i=1, self.images.numChildren, 1 do
 		
 		local moveToX, moveToY = self:calcCardXY(i)
-			
-		transition.to(self.images[i], {time=200+i*math.random(1,50), x=moveToX, y=moveToY})
+		local rotation = self:calcCardRotation(i)
+		
+		transition.to(self.images[i], {time=175+math.random(1, 75), x=moveToX, y=moveToY, rotation=rotation, xScale=1, yScale=1})
 		
 	end
 end
@@ -94,7 +118,7 @@ function playerVisTemplate:flipCard(card, onAnimationEnd)
 	-- attach the touch listeners to the card.
 end
 
-
+--
 function playerVisTemplate:calcHandXY()
 	
 	local meah = {
@@ -108,7 +132,7 @@ function playerVisTemplate:calcHandXY()
 		function() return display.actualContentWidth, display.contentCenterY end
 	}
 
-	return meah[self.index]()
+	return meah[self.model.index]()
 end
 
 --todo, add in rotation?
@@ -120,24 +144,24 @@ function playerVisTemplate:calcCardXY(cardIndex)
 		function() return ((self.images.numChildren*core.cardPixelWidth)*-.5) + (core.cardPixelWidth*cardIndex) - (core.cardPixelWidth*.5), 0 end
 	}
 	
-	return calc[self.index]()
+	return calc[self.model.index]()
 end
 
 --todo: add to calcCardXYR ?
 function playerVisTemplate:calcCardRotation(cardIndex)
 	local calc = {
 		function() return (-4.5*(#self.model.hand.cards*.5)) + (cardIndex*4.5) end,
-		function() return 180 + (-4.5*(#self.model.hand.cards*.5)) + (cardIndex*4.5) end
+		function() return 180 + (4.5*(#self.model.hand.cards*.5)) + (cardIndex*-4.5) end
 	}
-	return calc[self.index]()
+	return calc[self.model.index]()
 end
 
 -------------------------------------------------------------------------------------------------
 return {
 	create = function(model)
 		local vis = table.deepCopy(playerVisTemplate)
-		vis.index = model.index
 		vis.model = model
+		vis.playImages = display.newGroup()
 		vis.images = display.newGroup()
 		return vis
 	end

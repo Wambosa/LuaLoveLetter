@@ -13,7 +13,16 @@ function handTemplate:scramble()
 end
 
 function handTemplate:discard(index, cardStack)
-	cardStack:insert(table.remove(cards, index))
+	
+	--shift index for relevant cards still inHand
+	for i=#self.cards, index+1, -1 do
+		self.cards[i].index = self.cards[i].index-1
+	end
+	
+	--convert card.index from hand index to playPile index
+	self.cards[index].index = #cardStack+1
+	
+	table.insert(table.remove(self.cards, index), cardStack)
 end
 
 function handTemplate:randomDiscard()
