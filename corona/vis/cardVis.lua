@@ -77,12 +77,11 @@ local cardVisTemplate = {
 					self:tiltCard({x=oldX, y=oldY}, {x=newX, y=newY})
 
 					if(self.images.xScale == core.cardFocusZoom) then
-						transition.to( self.images, { time=200, xScale=core.cardDragZoom, yScale=core.cardDragZoom } )
+						transition.to( self.images, { time=100, xScale=core.cardDragZoom, yScale=core.cardDragZoom } )
 					elseif(self.images.xScale == core.cardDragZoom) then
 						transition.cancel(self.images) --perf: there was some serious lag with abusive drag motions
-					end
-					
-					transition.to( self.images, { time=35, x=newX, y=newY } )
+                        transition.to( self.images, { time=15, x=newX, y=newY } )--note: the 15 ms lag should be computed after considering framerate
+					end                        
 				end
 
 			elseif "ended" == phase or "cancelled" == phase then
@@ -190,7 +189,9 @@ function cardVisTemplate:tiltCard(old, new)
 			
 			local img = self.images[i]
 			
-			local lessX = (img.contentWidth * .0075) + math.abs((img.path.x1+img.path.x2+img.path.x3+img.path.x4)*.5)
+            local dt = deltaTime()
+            
+			local lessX = (img.contentWidth * .005) + math.abs((img.path.x1+img.path.x2+img.path.x3+img.path.x4)*.5)
 			local lessY = (img.contentHeight * .005) + math.abs((img.path.y1+img.path.y2+img.path.y3+img.path.y4)*.5)
 			
 			local dragLeft = 0

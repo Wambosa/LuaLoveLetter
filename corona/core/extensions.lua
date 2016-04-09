@@ -36,6 +36,15 @@ function math.clamp( _in, low, high )
 	return _in
 end
 
+runTime = 0
+ 
+function deltaTime()
+    local temp = system.getTimer()  -- Get current game time in ms
+    local dt = (temp-runTime) / (1000/30)  -- 60 fps or 30 fps as base
+    runTime = temp  -- Store game time
+    return dt
+end
+
 print_r = function(message, obj, tabDepth)
 	--todo: maybe get the func signature? metatable?
 	tabDepth = tabDepth or 0
