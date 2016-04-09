@@ -63,11 +63,11 @@ function deckTemplate:dealToMax(...)
 end
 
 function deckTemplate:banishTopCard()
-		table.insert(self.banishPile, self:draw())
+    table.insert(self.banishPile, self:draw())
 end
 
 return {
-	newDeck = function()
-		return table.deepCopy(deckTemplate)
-	end
+    newDeck = function()
+        return table.deepCopy(deckTemplate)
+    end
 }
