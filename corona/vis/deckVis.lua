@@ -9,7 +9,7 @@ local deckVisTemplate = {
 function deckVisTemplate:render(deckX, deckY, onAnimationEnd)
 
 	self.images.x, self.images.y = deckX, deckY
-	self.banishImages.x, self.banishImages.y = deckX, deckY-core.cardPixelHeight*.65
+	self.banishImages.x, self.banishImages.y = deckX -core.cardPixelWidth, deckY
 	
 	local dropCardAnimation = {
 		width=core.cardPixelWidth*.5,
@@ -70,7 +70,7 @@ function deckVisTemplate:toggleBanishShowcase(event)
 		self.isShowcasing = false
 		
 		self.trigBanishShowcase.width, self.trigBanishShowcase.height = core.cardPixelWidth*.5, core.cardPixelHeight*.5
-		self.trigBanishShowcase.x, self.trigBanishShowcase.y = display.contentCenterX+100, display.contentCenterY-(core.cardPixelHeight*.65)
+		self.trigBanishShowcase.x, self.trigBanishShowcase.y = self.banishImages.x, self.banishImages.y
 
 		for i=1, self.banishImages.numChildren, 1 do
 			--todo: the scale is currently crazy. fix it up from the beginning to be the size adjustor

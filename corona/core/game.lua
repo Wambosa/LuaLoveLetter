@@ -7,7 +7,8 @@ local game = {
 	players = {},
 	currentPlayerIndex = 0,
 	deck = nil,
-	startingHandAmount = 0
+	startingHandAmount = 0,
+    selection = 0 --this will likely need some improvement over time. for now, it can simply be an index of a player/card
 }
 
 local gameOptionsTemplate = {

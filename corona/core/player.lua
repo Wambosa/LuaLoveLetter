@@ -20,7 +20,7 @@ return {
 	newPlayer = function(index, name)
 		local player = table.deepCopy(playerTemplate)
 		player.index = index
-		player.name = name
+		player.name = name:upper()
 		player.state = 'wait'
 		return player
 	end

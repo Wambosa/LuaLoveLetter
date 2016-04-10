@@ -129,7 +129,7 @@ function scene:show( event )
 		
 		self:showTableTop()
 		
-		self.buttons = display.newGroup()
+		self.buttons = display.newGroup() --todo: am i using this anymore?
 		
 		self.deckVis = deckVisModule.create(game.deck)
 		
@@ -144,8 +144,29 @@ function scene:show( event )
 		local visualizeTheRestOfTheStuff = function()
 			print('should only be called once!')
 			
+            --todo: playPileShowCases
+            for i=1, #game.players, 1 do
+                self.playerVisuals[i].nameImage:addEventListener('touch', function(event) 
+                        
+                    --todo: only allow selection after certain cards are activated.
+                    if(game.state == 'turn' and game.currentPlayerIndex == 1) then
+                        game.selection = i --hmmmm
+                        --animate selection
+                        print("selected:", game.players[i].name)
+                        
+                        if(self.selectionVis)then self.selectionVis:removeSelf() self.selectionVis = nil end
+                        
+                        local sx, sy = self.playerVisuals[i]:calcNameXY()
+                        self.selectionVis = display.newText("O", sx, sy, core.tableScratchFont, 75)
+                        
+                        self.playerVisuals[i].images:toFront()
+                    end
+                    
+                end)
+            end
+            
 			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/invisible.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
-			self.deckVis.trigBanishShowcase.x, self.deckVis.trigBanishShowcase.y = display.contentCenterX+100, display.contentCenterY-(core.cardPixelHeight*.5)
+			self.deckVis.trigBanishShowcase.x, self.deckVis.trigBanishShowcase.y = self.deckVis.banishImages.x, self.deckVis.banishImages.y
 			
 			game:beginTurn()
 			
@@ -179,11 +200,8 @@ function scene:show( event )
 			-- self.deckVis
 		end
 		
-		self.deckVis:render(display.contentCenterX+100, display.contentCenterY, visDealCards)
+		self.deckVis:render(display.contentCenterX+(core.cardPixelWidth*core.cardTableZoom), display.contentCenterY, visDealCards)
 
-      -- Called when the scene is now on screen.
-      -- Insert code here to make the scene come alive.
-      -- Example: start timers, begin animation, play audio, etc.
    end
 end
 

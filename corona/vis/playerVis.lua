@@ -2,6 +2,7 @@ local cardVisModule = require('vis.cardVis')
 
 local playerVisTemplate = {
 	model = nil,
+    nameImage = nil,
 	images = nil, --note: container for hand images and display groups. used to keep positioning relative to hand position center
 	playImages = nil,
 	cardVisuals = {} --todo: needs to be an array of cardVis
@@ -13,15 +14,20 @@ local playerVisTemplate = {
 function playerVisTemplate:render(drawFunc, onAnimationEnd)
 
 	--todo: display avatar, player name, status (needs to be based on perspective. not the same render for local player and enemy player)
-		
+
 	self.images.x, self.images.y = self:calcHandXY()
-	self.playImages.x, self.playImages.y = self.images.x, self.images.y-75
+	self.playImages.x, self.playImages.y = self.images.x, self.images.y-110 --todo: self.calcPlayPile
 	self.playImages.xScale, self.playImages.yScale = .5, .5
 
 	local orderedFuncs = {}
 	
 	local cardCount = #self.model.hand.cards
 	
+    --todo: play scratch sound and draw name on table
+    --wrap onAnimationEnd with the write func so that it happens after all the card animation.
+    self.nameImage.x, self.nameImage.y = self:calcNameXY()
+    self.nameImage:setFillColor( 227/255, 217/255, 86/255)
+    
 	--note: this must be in reverse so that the index for the vis array lines up with the dataModel array
 	for cardIndex = cardCount, 1, -1 do
 		
@@ -135,6 +141,13 @@ function playerVisTemplate:calcHandXY()
 	return meah[self.model.index]()
 end
 
+function playerVisTemplate:calcNameXY()
+    local x, y = self:calcHandXY()
+    
+    if(self.model.index == 1)then return x, y-70 end
+    if(self.model.index == 2)then return x, y+70 end
+end
+
 --todo, add in rotation?
 function playerVisTemplate:calcCardXY(cardIndex)
 	local calc = {
@@ -161,6 +174,7 @@ return {
 	create = function(model)
 		local vis = table.deepCopy(playerVisTemplate)
 		vis.model = model
+        vis.nameImage = display.newText(model.name, -100, -100, core.tableScratchFont, 22)
 		vis.playImages = display.newGroup()
 		vis.images = display.newGroup()
 		return vis

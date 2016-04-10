@@ -38,7 +38,7 @@ end
 
 runTime = 0
  
-function deltaTime()
+function deltaTime()--todo: this needs to be a part of enterFrame so that it updates every frame
     local temp = system.getTimer()  -- Get current game time in ms
     local dt = (temp-runTime) / (1000/30)  -- 60 fps or 30 fps as base
     runTime = temp  -- Store game time

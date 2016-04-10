@@ -11,11 +11,14 @@ local cardPixelWidth, cardPixelHeight = 71, 100 --note: these measurements are a
 core = makeReadonlyTable({
 	cardBackImg = 'img/cards/000_back.png',
 	
+    tableScratchFont = "secret.ttf",
+    
 	--size: some common sizes i keep on referencing
 	cardPixelWidth = cardPixelWidth,
 	cardPixelHeight = cardPixelHeight,
 	cardFocusZoom = 2.5,
 	cardDragZoom = .75,
+    cardTableZoom = .5,
 	
 	--time: delay in milliseconds
 	flipDelay = 150,
