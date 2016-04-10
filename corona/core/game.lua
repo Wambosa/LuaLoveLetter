@@ -12,7 +12,6 @@ local game = {
 }
 
 local gameOptionsTemplate = {
-	playerCount = 2,--todo: redundant
 	playerNames = {'player 1', 'player 2'},
 	startingHandAmount = 1,
 	turnDrawAmount = 1,

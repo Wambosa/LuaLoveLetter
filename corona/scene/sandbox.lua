@@ -159,13 +159,14 @@ function scene:show( event )
                         local sx, sy = self.playerVisuals[i]:calcNameXY()
                         self.selectionVis = display.newText("O", sx, sy, core.tableScratchFont, 75)
                         
+                        self.playerVisuals[i].playImages:toFront()
                         self.playerVisuals[i].images:toFront()
                     end
                     
                 end)
             end
             
-			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/invisible.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
+			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/background.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
 			self.deckVis.trigBanishShowcase.x, self.deckVis.trigBanishShowcase.y = self.deckVis.banishImages.x, self.deckVis.banishImages.y
 			
 			game:beginTurn()

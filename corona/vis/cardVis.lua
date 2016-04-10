@@ -168,7 +168,7 @@ function cardVisTemplate:anim_slowHandRise()
 	self.images.xScale, self.images.yScale = core.cardFocusZoom, core.cardFocusZoom
 	transition.to(self.images, {time=5000, y=(-core.cardPixelHeight*core.cardFocusZoom)*.55})
 end
---animation: custom - in a loud flash of the imageRect edges. seems to always be white?
+--animation: custom - in a loud flash of the imageRect edges.
 function cardVisTemplate:anim_edgeFlash()
 	local reStroke, unStroke
 	reStroke = function() transition.to(self.images, {time=50, strokeWidth=5, onComplete=unStroke}) end
@@ -176,8 +176,8 @@ function cardVisTemplate:anim_edgeFlash()
 
 	reStroke()
 
-	img.strokeWidth=.1
-	img:setStrokeColor(57,255,20, 1)
+	img.strokeWidth = .1
+	img:setStrokeColor(57/255,255/255,20/255, 1)
 end
 
 --note: since the group does not have path manipulation. each image object within the group must be manipulated together.

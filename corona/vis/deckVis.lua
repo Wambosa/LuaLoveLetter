@@ -5,7 +5,7 @@ local deckVisTemplate = {
 	discardImages = nil,
 	nextIndex = 0
 }
-
+--
 function deckVisTemplate:render(deckX, deckY, onAnimationEnd)
 
 	self.images.x, self.images.y = deckX, deckY
@@ -34,13 +34,13 @@ function deckVisTemplate:render(deckX, deckY, onAnimationEnd)
 		end
 	end
 end
-
+--
 function deckVisTemplate:draw(toX, toY, onAnimationEnd)
 	local topCard = self.images[self:next()]
 	--transition.cancel(topCard)
 	transition.to(topCard, {time=core.slideDelay, x=toX-self.images.x, y=toY-self.images.y, onComplete=onAnimationEnd(topCard)})
 end
-
+--
 function deckVisTemplate:banish(index)
 	
 	local topCard = self.images[self:next()]
@@ -59,30 +59,31 @@ function deckVisTemplate:banish(index)
 		banned.x, banned.y = 0, -index
 	end})
 end
-
+--
 function deckVisTemplate:toggleBanishShowcase(event)
 	--todo: clean this up
 	
 	self.banishImages:toFront()
 
-	if (event.phase == "began" and self.isShowcasing) then
+	if (event.phase == "began" and self.isShowcasing) then --disable showcase
 		
 		self.isShowcasing = false
-		
+        
 		self.trigBanishShowcase.width, self.trigBanishShowcase.height = core.cardPixelWidth*.5, core.cardPixelHeight*.5
 		self.trigBanishShowcase.x, self.trigBanishShowcase.y = self.banishImages.x, self.banishImages.y
 
 		for i=1, self.banishImages.numChildren, 1 do
 			--todo: the scale is currently crazy. fix it up from the beginning to be the size adjustor
+            
 			transition.to(self.banishImages[i], {time = 250, x = 0, y = 0, rotation = math.random(-30,30), xScale=1, yScale=1})
 		end
 
-	else
+	elseif(event.phase == "began") then --enable showcase
 		self.isShowcasing = true
 
 		local sizeScale = 4
 
-		transition.to(self.trigBanishShowcase, {time=510, x=display.contentCenterX, y=display.contentCenterY, width=display.contentWidth, height=display.contentHeight})
+		self.trigBanishShowcase.x, self.trigBanishShowcase.y, self.trigBanishShowcase.width, self.trigBanishShowcase.height = display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.contentHeight
 
 		for i=1, self.banishImages.numChildren, 1 do
 			--todo: will have to convert into an image group with all the attachments

@@ -140,7 +140,7 @@ function playerVisTemplate:calcHandXY()
 
 	return meah[self.model.index]()
 end
-
+--
 function playerVisTemplate:calcNameXY()
     local x, y = self:calcHandXY()
     
