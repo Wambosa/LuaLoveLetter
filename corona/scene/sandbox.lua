@@ -166,7 +166,7 @@ function scene:show( event )
                 end)
             end
             
-			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/background.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
+			self.deckVis.trigBanishShowcase = display.newImageRect(self.buttons, 'img/invisible.png', core.cardPixelWidth*.5, core.cardPixelHeight*.5)
 			self.deckVis.trigBanishShowcase.x, self.deckVis.trigBanishShowcase.y = self.deckVis.banishImages.x, self.deckVis.banishImages.y
 			
 			game:beginTurn()
